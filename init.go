@@ -22,20 +22,20 @@ const (
 	White
 )
 
-type Logger struct {
+type Log struct {
 	Worker *log.Logger
 	Color bool
 }
 
-func (l *Logger) Log(level Level, info *Info) error {
+func (l *Logger) Log(level Level, calldepth int, info *Info) error {
 	if b.Color {
 		buf := &bytes.Buffer{}
 		buf.Write([]byte(colors[level]))
 		buf.Write([]byte(info.Formatted()))
 		buf.Write([]byte("\033[0m"))
-		return b.Worker.Output(buf.String())
+		return b.Worker.Output(calldepth+1, buf.String())
 	} else {
-		return b.Worker.Output(bu)
+		return b.Worker.Output(calldepth+1, info.Formatted())
 	}
 }
 
@@ -49,6 +49,6 @@ func initColors() {
 		ERROR:    colorString(Red),
 		WARNING:  colorString(Yellow),
 		NOTICE:   colorString(Green),
-		DEBUG:    colorSeq(Cyan)
+		DEBUG:    colorString(Cyan)
 	}
 }

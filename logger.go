@@ -91,3 +91,17 @@ func (*l Logger) Log(lvl string, message string) {
 	}
 	l.worker.log(lvl, 2, info)
 }
+
+func (*l Logger) Fatal(message string) {
+	l.Log("CRITICAL", message)
+	os.Exit(1)
+}
+
+func (*l Logger) Panic(message string) {
+	l.Log("CRITICAL", message)
+	panic(message)
+}
+
+func (*l Logger) Critical(message string) {
+	l.Log("CRITICAL", message)
+}

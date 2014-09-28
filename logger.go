@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// Map for te various codes of colors
 	colors map[string]string
 	
 	// Contains color strings for stdout
@@ -108,7 +109,7 @@ func New(module string, color int) (*Logger, error) {
 // The log commnand is the function available to user to log message, lvl specifies
 // the degree of the messagethe user wants to log, message is the info user wants to log
 func (l *Logger) Log(lvl string, message string) {
-	var formatString string = "#%d %s ▶ %.4s %s"
+	var formatString string = "#%d %s ▶ %.3s %s"
 	info := &Info{
 		Id:      atomic.AddUint64(&sequenceNo, 1),
 		Time:    time.Now().Format("2006-01-02 15:04:05") ,
@@ -157,7 +158,7 @@ func (l *Logger) Info(message string) {
 	l.Log("INFO", message)
 }
 
-// Devug logs a message at Devug level
+// Debug logs a message at Debug level
 func (l *Logger) Debug(message string) {
 	l.Log("DEBUG", message)
 }

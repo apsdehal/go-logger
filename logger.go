@@ -29,9 +29,9 @@ type Worker struct {
 
 type Info struct {
 	Time time.Time
-	module string
-	level string
-	message string
+	Module string
+	Level string
+	Message string
 	format string
 }
 
@@ -40,7 +40,7 @@ type Logger {
 	worker *Worker
 }
 func (r *Info) Output() string {
-	msg := fmt.Sprintf(r.format, r.Time, r.level, r.message )
+	msg := fmt.Sprintf(r.format, r.Time, r.Level, r.message )
 	return msg
 }
 
@@ -48,7 +48,7 @@ func NewWorker(prefix string, flag int, color bool) *Worker{
 	return &Worker{Minion: log.New(os.Stderr, prefix, flag), Color: color}
 }
 
-func (l *Worker) Log(level Level, calldepth int, info *Info) error {
+func (l *Worker) Log(level string, calldepth int, info *Info) error {
 	if b.Color {
 		buf := &bytes.Buffer{}
 		buf.Write([]byte(colors[level]))
@@ -65,16 +65,29 @@ func colorString(color color) string {
 }
 
 func initColors() {
-	colors = []{
-		CRITICAL: colorString(Magenta),
-		ERROR:    colorString(Red),
-		WARNING:  colorString(Yellow),
-		NOTICE:   colorString(Green),
-		DEBUG:    colorString(Cyan)
+	colors = map[string]int{
+		"CRITICAL": colorString(Magenta),
+		"ERROR":    colorString(Red),
+		"WARNING":  colorString(Yellow),
+		"NOTICE":   colorString(Green),
+		"DEBUG":    colorString(Cyan)
 	}
 }
 
 func (*l Logger) New(module string, color bool) (*Logger, error) {
+	initColors()
 	newWorker := NewWorker("", 0, color)
 	return &Logger{Module: module, worker: newWorker}, nil	
+}
+
+func (*l Logger) Log(lvl string, message string) {
+	var formatString string = "Some format here"
+	info := &Info{
+		Time: timeNow(),
+		Module: l.Module,
+		Level: lvl,
+		Message: message,
+		format: formatString
+	}
+	l.worker.log(lvl, 2, info)
 }

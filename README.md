@@ -16,7 +16,7 @@ Example [program](examples/example.go) demonstrates how to use the logger.
 package main
 
 import (
-	"go get github.com/apsdehal/go-logger"
+	"github.com/apsdehal/go-logger"
 )
 
 func main () {

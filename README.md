@@ -5,6 +5,7 @@ A simple go logger for easy logging and debugging of your programs
 # Example
 
 Example [program](examples/example.go) demonstrates how to use the logger.
+
 [![Example Output](examples/example.png)](examples/example.go)
 
 ```go
@@ -41,6 +42,10 @@ func main () {
 `go get github.com/apsdehal/go-logger`
 
 Use `go get -u` to update the package.
+
+## Thanks
+
+Thanks goes to all go-loggers out there in github world
 
 ## License
 

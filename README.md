@@ -1,5 +1,7 @@
 # go-logger
 
+[![Build Status](https://travis-ci.org/apsdehal/go-logger.svg?branch=master)](https://travis-ci.org/apsdehal/go-logger)
+
 A simple go logger for easy logging and debugging of your programs
 
 [Click here to view documentation](http://godoc.org/github.com/apsdehal/go-logger)

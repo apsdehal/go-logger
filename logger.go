@@ -105,3 +105,23 @@ func (*l Logger) Panic(message string) {
 func (*l Logger) Critical(message string) {
 	l.Log("CRITICAL", message)
 }
+
+func (*l Logger) Error(message string) {
+	l.Log("ERROR", message)
+}
+
+func (*l Logger) Warning(message string) {
+	l.Log("WARNING", message)
+}
+
+func (*l Logger) Notice(message string) {
+	l.Log("NOTICE", message)
+}
+
+func (*l Logger) Info(message string) {
+	l.Log("INFO", message)
+}
+
+func (*l Logger) Debug(message string) {
+	l.Log("DEBUG", message)
+}

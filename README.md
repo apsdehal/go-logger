@@ -2,6 +2,8 @@
 
 A simple go logger for easy logging and debugging of your programs
 
+[Click here to view documentation](http://godoc.org/github.com/apsdehal/go-logger)
+
 # Example
 
 Example [program](examples/example.go) demonstrates how to use the logger.

@@ -99,7 +99,7 @@ func initColors() {
 }
 
 // Returns a new instance of logger class, module is the specific module for which we are logging
-// colors defines whether the output is to be colored or not
+// , color defines whether the output is to be colored or not
 func New(module string, color int) (*Logger, error) {
 	initColors()
 	newWorker := NewWorker("", 0, color)
@@ -121,7 +121,7 @@ func (l *Logger) Log(lvl string, message string) {
 	l.worker.Log(lvl, 2, info)
 }
 
-// Fatal is just like func l,Critical logger except that it is followed by exit to program
+// Fatal is just like func l,Cr.tical logger except that it is followed by exit to program
 func (l *Logger) Fatal(message string) {
 	l.Log("CRITICAL", message)
 	os.Exit(1)

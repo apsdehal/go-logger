@@ -93,6 +93,7 @@ func initColors() {
 		"WARNING":  colorString(Yellow),
 		"NOTICE":   colorString(Green),
 		"DEBUG":    colorString(Cyan),
+		"INFO" : colorString(White),
 	}
 }
 
@@ -107,7 +108,7 @@ func New(module string, color int) (*Logger, error) {
 // The log commnand is the function available to user to log message, lvl specifies
 // the degree of the messagethe user wants to log, message is the info user wants to log
 func (l *Logger) Log(lvl string, message string) {
-	var formatString string = "%d %s ▶ %.4s %s"
+	var formatString string = "#%d %s ▶ %.4s %s"
 	info := &Info{
 		Id:      atomic.AddUint64(&sequenceNo, 1),
 		Time:    time.Now().Format("2006-01-02 15:04:05") ,

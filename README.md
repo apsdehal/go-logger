@@ -45,6 +45,11 @@ func main () {
 
 Use `go get -u` to update the package.
 
+# Tests
+
+Run `go test logger` to run test on logger
+and `go bench` for benchmarks
+
 ## Thanks
 
 Thanks goes to all go-loggers out there in github world

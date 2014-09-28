@@ -16,7 +16,7 @@ var (
 	colors map[string]string
 	
 	// Contains color strings for stdout
-	sequenceNo uint64
+	logNo uint64
 )
 // Color numbers for stdout
 const (
@@ -111,7 +111,7 @@ func New(module string, color int) (*Logger, error) {
 func (l *Logger) Log(lvl string, message string) {
 	var formatString string = "#%d %s ▶ %.3s %s"
 	info := &Info{
-		Id:      atomic.AddUint64(&sequenceNo, 1),
+		Id:      atomic.AddUint64(&logNo, 1),
 		Time:    time.Now().Format("2006-01-02 15:04:05") ,
 		Module:  l.Module,
 		Level:   lvl,

@@ -8,11 +8,15 @@ import (
  	"log"
  	"time"
  	"os"
+ 	"sync/atomic"
 )
 
-// Contains color strings for stdout
-var colors map[string]string
-
+var (
+	colors map[string]string
+	
+	// Contains color strings for stdout
+	sequenceNo uint64
+)
 // Color numbers for stdout
 const (
 	Black = (iota + 30)
@@ -36,6 +40,7 @@ type Worker struct {
 // For which we are logging, level is the state, importance and type of message logged,
 // Message contains the string to be logged, format is the format of string to be passed to sprintf
 type Info struct {
+	Id uint64
 	Time string
 	Module string
 	Level string
@@ -52,7 +57,7 @@ type Logger struct {
 
 // Returns a proper string to be outputted for a particular info
 func (r *Info) Output() string {
-	msg := fmt.Sprintf(r.format, r.Time, r.Level, r.Message )
+	msg := fmt.Sprintf(r.format, r.Id, r.Time, r.Level, r.Message )
 	return msg
 }
 
@@ -102,13 +107,14 @@ func New(module string, color int) (*Logger, error) {
 // The log commnand is the function available to user to log message, lvl specifies
 // the degree of the messagethe user wants to log, message is the info user wants to log
 func (l *Logger) Log(lvl string, message string) {
-	var formatString string = "%s ▶ %.4s %s"
+	var formatString string = "%d %s ▶ %.4s %s"
 	info := &Info{
-		Time: time.Now().Format("2006-01-02 15:04:05") ,
-		Module: l.Module,
-		Level: lvl,
+		Id:      atomic.AddUint64(&sequenceNo, 1),
+		Time:    time.Now().Format("2006-01-02 15:04:05") ,
+		Module:  l.Module,
+		Level:   lvl,
 		Message: message,
-		format: formatString,
+		format:  formatString,
 	}
 	l.worker.Log(lvl, 2, info)
 }

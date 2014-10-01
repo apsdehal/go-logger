@@ -1,6 +1,9 @@
 package logger
 
-import "testing"
+import (
+	"testing"
+	"os"
+)
 
 func BenchmarkLoggerLog(b *testing.B) {
 	b.StopTimer()
@@ -120,7 +123,7 @@ func TestInitColors(t *testing.T) {
 }
 
 func TestNewWorker(t *testing.T) {
-	var worker *Worker = NewWorker("", 0, 1)
+	var worker *Worker = NewWorker("", 0, 1, os.Stderr)
 	if worker.Minion == nil {
 		t.Errorf("Minion was not established")
 	}
@@ -128,7 +131,7 @@ func TestNewWorker(t *testing.T) {
 
 func BenchmarkNewWorker(b *testing.B) {
 	for n := 0; n <= b.N; n++ {
-		worker := NewWorker("", 0, 1)
+		worker := NewWorker("", 0, 1, os.Stderr)
 		if worker == nil {
 			panic("Failed to initiate worker")
 		}

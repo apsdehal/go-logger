@@ -8,6 +8,7 @@ import (
  	"log"
  	"time"
  	"os"
+ 	"io"
  	"sync/atomic"
 )
 
@@ -64,8 +65,8 @@ func (r *Info) Output() string {
 
 // Returns an instance of worker class, prefix is the string attached to every log, 
 // flag determine the log params, color parameters verifies whether we need colored outputs or not
-func NewWorker(prefix string, flag int, color int) *Worker{
-	return &Worker{Minion: log.New(os.Stderr, prefix, flag), Color: color}
+func NewWorker(prefix string, flag int, color int, out io.Writer) *Worker{
+	return &Worker{Minion: log.New(out, prefix, flag), Color: color}
 }
 
 // Function of Worker class to log a string based on level
@@ -94,15 +95,33 @@ func initColors() {
 		"WARNING":  colorString(Yellow),
 		"NOTICE":   colorString(Green),
 		"DEBUG":    colorString(Cyan),
-		"INFO" : colorString(White),
+		"INFO" :    colorString(White),
 	}
 }
 
 // Returns a new instance of logger class, module is the specific module for which we are logging
-// , color defines whether the output is to be colored or not
-func New(module string, color int) (*Logger, error) {
+// , color defines whether the output is to be colored or not, out is instance of type io.Writer defaults
+// to os.Stderr
+func New(args ...interface{}) (*Logger, error) {
 	initColors()
-	newWorker := NewWorker("", 0, color)
+
+	var module string = "DEFAULT"
+	var color int = 1
+	var out io.Writer = os.Stderr
+
+	for _, arg := range(args) {
+		switch t := arg.(type) {
+			case string:
+				module = t
+			case int:
+				color = t
+			case io.Writer:
+				out = t
+			default:
+				panic("logger: Unknown argument")			
+		}
+	}
+	newWorker := NewWorker("", 0, color, out)
 	return &Logger{Module: module, worker: newWorker}, nil	
 }
 

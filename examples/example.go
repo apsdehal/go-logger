@@ -1,12 +1,14 @@
 package main
 
 import (
+	"os"
 	"github.com/apsdehal/go-logger"
 )
 
 func main () {
 	// Get the instance for logger class
-	log, err := logger.New("test", 1)
+	// Third option is optional and is instance of type io.Writer, defaults to os.Stderr
+	log, err := logger.New("test", 1, os.Stdout)
 	if err != nil {
 		panic(err) // Check for error
 	}

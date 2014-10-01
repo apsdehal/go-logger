@@ -20,8 +20,10 @@ import (
 )
 
 func main () {
-	// Get the instance for logger class, 1 states if we want to use coloring
-	log, err := logger.New("test", 1)
+	// Get the instance for logger class, "test" is the module name, 1 is used to 
+	// state if we want coloring 
+	// Third option is optional and is instance of type io.Writer, defaults to os.Stderr
+	log, err := logger.New("test", 1, os.Stdout)
 	if err != nil {
 		panic(err) // Check for error
 	}

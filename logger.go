@@ -3,22 +3,26 @@ package logger
 
 // Import packages
 import (
- 	"bytes"
- 	"fmt"
- 	"log"
- 	"time"
- 	"os"
- 	"io"
- 	"sync/atomic"
+	"bytes"
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"runtime"
+	"strconv"
+	"strings"
+	"sync/atomic"
+	"time"
 )
 
 var (
 	// Map for te various codes of colors
 	colors map[string]string
-	
+
 	// Contains color strings for stdout
 	logNo uint64
 )
+
 // Color numbers for stdout
 const (
 	Black = (iota + 30)
@@ -35,19 +39,25 @@ const (
 // if colored output is to be produced
 type Worker struct {
 	Minion *log.Logger
-	Color int
+	Color  int
 }
 
 // Info class, Contains all the info on what has to logged, time is the current time, Module is the specific module
 // For which we are logging, level is the state, importance and type of message logged,
 // Message contains the string to be logged, format is the format of string to be passed to sprintf
 type Info struct {
-	Id uint64
-	Time string
-	Module string
-	Level string
-	Message string
-	format string
+	Id            uint64
+	Time          string
+	Module        string
+	Level         string
+	Message       string
+	FuncName      string
+	ShortFuncName string
+	FileName      string
+	ShortFileName string
+	Goroutine     string
+	LineNumber    string
+	format        string
 }
 
 // Logger class that is an interface to user to log messages, Module is the module for which we are testing
@@ -59,13 +69,13 @@ type Logger struct {
 
 // Returns a proper string to be outputted for a particular info
 func (r *Info) Output() string {
-	msg := fmt.Sprintf(r.format, r.Id, r.Time, r.Level, r.Message )
+	msg := fmt.Sprintf(r.format, r.Id, r.Time, r.ShortFileName, r.LineNumber, r.ShortFuncName, r.Goroutine, r.Level, r.Message)
 	return msg
 }
 
-// Returns an instance of worker class, prefix is the string attached to every log, 
+// Returns an instance of worker class, prefix is the string attached to every log,
 // flag determine the log params, color parameters verifies whether we need colored outputs or not
-func NewWorker(prefix string, flag int, color int, out io.Writer) *Worker{
+func NewWorker(prefix string, flag int, color int, out io.Writer) *Worker {
 	return &Worker{Minion: log.New(out, prefix, flag), Color: color}
 }
 
@@ -95,7 +105,7 @@ func initColors() {
 		"WARNING":  colorString(Yellow),
 		"NOTICE":   colorString(Green),
 		"DEBUG":    colorString(Cyan),
-		"INFO" :    colorString(White),
+		"INFO":     colorString(White),
 	}
 }
 
@@ -109,33 +119,47 @@ func New(args ...interface{}) (*Logger, error) {
 	var color int = 1
 	var out io.Writer = os.Stderr
 
-	for _, arg := range(args) {
+	for _, arg := range args {
 		switch t := arg.(type) {
-			case string:
-				module = t
-			case int:
-				color = t
-			case io.Writer:
-				out = t
-			default:
-				panic("logger: Unknown argument")			
+		case string:
+			module = t
+		case int:
+			color = t
+		case io.Writer:
+			out = t
+		default:
+			panic("logger: Unknown argument")
 		}
 	}
 	newWorker := NewWorker("", 0, color, out)
-	return &Logger{Module: module, worker: newWorker}, nil	
+	return &Logger{Module: module, worker: newWorker}, nil
 }
 
 // The log commnand is the function available to user to log message, lvl specifies
 // the degree of the messagethe user wants to log, message is the info user wants to log
 func (l *Logger) Log(lvl string, message string) {
-	var formatString string = "#%d %s ▶ %.3s %s"
+	pc, file_name, line_num, ok := runtime.Caller(3)
+	if !ok {
+		return
+	}
+	func_name := runtime.FuncForPC(pc).Name()
+	func_name_s := func_name[strings.LastIndex(func_name, ".")+1:]
+	file_name_s := file_name[strings.LastIndex(file_name, "/")+1:]
+
+	var formatString string = "#%d %s %s:%s(%s) [%s] ▶  %.3s %s"
 	info := &Info{
-		Id:      atomic.AddUint64(&logNo, 1),
-		Time:    time.Now().Format("2006-01-02 15:04:05") ,
-		Module:  l.Module,
-		Level:   lvl,
-		Message: message,
-		format:  formatString,
+		Id:            atomic.AddUint64(&logNo, 1),
+		Time:          time.Now().Format("2006-01-02 15:04:05"),
+		Module:        l.Module,
+		Level:         lvl,
+		FuncName:      func_name,
+		ShortFuncName: func_name_s,
+		FileName:      file_name,
+		ShortFileName: file_name_s,
+		LineNumber:    strconv.Itoa(line_num),
+		Goroutine:     strconv.Itoa(runtime.NumGoroutine()),
+		Message:       message,
+		format:        formatString,
 	}
 	l.worker.Log(lvl, 2, info)
 }

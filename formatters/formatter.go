@@ -14,5 +14,5 @@ type Formatter interface {
 }
 
 func Default() Formatter {
-	return &Basic{}
+	return Basic()
 }

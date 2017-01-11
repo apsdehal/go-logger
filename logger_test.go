@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"testing"
 	"os"
+	"testing"
 )
 
 func BenchmarkLoggerLog(b *testing.B) {
@@ -13,7 +13,7 @@ func BenchmarkLoggerLog(b *testing.B) {
 	}
 
 	var tests = []struct {
-		level string
+		level   string
 		message string
 	}{
 		{
@@ -78,39 +78,39 @@ func TestColorString(t *testing.T) {
 
 func TestInitColors(t *testing.T) {
 	initColors()
-	var tests = []struct{
-		level string
-		color int
+	var tests = []struct {
+		level       string
+		color       int
 		colorString string
 	}{
 		{
 			"CRITICAL",
-			 Magenta,
+			Magenta,
 			"\033[35m",
 		},
 		{
 			"ERROR",
-			 Red,
+			Red,
 			"\033[31m",
 		},
 		{
 			"WARNING",
-			 Yellow,
+			Yellow,
 			"\033[33m",
 		},
 		{
 			"NOTICE",
-			 Green,
+			Green,
 			"\033[32m",
 		},
 		{
 			"DEBUG",
-			 Cyan,
+			Cyan,
 			"\033[36m",
 		},
 		{
 			"INFO",
-			 White,
+			White,
 			"\033[37m",
 		},
 	}

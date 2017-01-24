@@ -194,3 +194,18 @@ func (l *Logger) Info(message string) {
 func (l *Logger) Debug(message string) {
 	l.log_internal("DEBUG", message, 2)
 }
+
+func (l *Logger) StackAsError(message string) {
+	if message == "" {
+		message = "Stack info"
+	}
+	message += "\n"
+	l.log_internal("ERROR", message+Stack(), 2)
+}
+
+// Returns a string with the execution stack for this goroutine
+func Stack() string {
+	buf := make([]byte, 1000000)
+	runtime.Stack(buf, false)
+	return string(buf)
+}

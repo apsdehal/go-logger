@@ -158,41 +158,65 @@ func (l *Logger) Fatal(message string) {
 	l.log_internal("CRITICAL", message, 2)
 	os.Exit(1)
 }
+func (l *Logger) FatalF(format string, a ...interface{}) {
+	l.Fatal(fmt.Sprintf(format, a...))
+}
 
 // Panic is just like func l.Critical except that it is followed by a call to panic
 func (l *Logger) Panic(message string) {
 	l.log_internal("CRITICAL", message, 2)
 	panic(message)
 }
+func (l *Logger) PanicF(format string, a ...interface{}) {
+	l.Panic(fmt.Sprintf(format, a...))
+}
 
 // Critical logs a message at a Critical Level
 func (l *Logger) Critical(message string) {
 	l.log_internal("CRITICAL", message, 2)
+}
+func (l *Logger) CriticalF(format string, a ...interface{}) {
+	l.Critical(fmt.Sprintf(format, a...))
 }
 
 // Error logs a message at Error level
 func (l *Logger) Error(message string) {
 	l.log_internal("ERROR", message, 2)
 }
+func (l *Logger) ErrorF(format string, a ...interface{}) {
+	l.Error(fmt.Sprintf(format, a...))
+}
 
 // Warning logs a message at Warning level
 func (l *Logger) Warning(message string) {
 	l.log_internal("WARNING", message, 2)
+}
+func (l *Logger) WarningF(format string, a ...interface{}) {
+	l.Warning(fmt.Sprintf(format, a...))
 }
 
 // Notice logs a message at Notice level
 func (l *Logger) Notice(message string) {
 	l.log_internal("NOTICE", message, 2)
 }
+func (l *Logger) NoticeF(format string, a ...interface{}) {
+	l.Notice(fmt.Sprintf(format, a...))
+}
 
 // Info logs a message at Info level
 func (l *Logger) Info(message string) {
 	l.log_internal("INFO", message, 2)
 }
+func (l *Logger) InfoF(format string, a ...interface{}) {
+	l.Info(fmt.Sprintf(format, a...))
+}
 
 // Debug logs a message at Debug level
 func (l *Logger) Debug(message string) {
 	l.log_internal("DEBUG", message, 2)
+}
+func (l *Logger) DebugF(format string, a ...interface{}) {
+	l.Debug(fmt.Sprintf(format, a...))
 }
 
 func (l *Logger) StackAsError(message string) {
@@ -201,6 +225,14 @@ func (l *Logger) StackAsError(message string) {
 	}
 	message += "\n"
 	l.log_internal("ERROR", message+Stack(), 2)
+}
+
+func (l *Logger) StackAsCritical(message string) {
+	if message == "" {
+		message = "Stack info"
+	}
+	message += "\n"
+	l.log_internal("CRITICAL", message+Stack(), 2)
 }
 
 // Returns a string with the execution stack for this goroutine

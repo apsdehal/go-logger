@@ -15,7 +15,8 @@ Example [program](examples/example.go) demonstrates how to use the logger.
 package main
 
 import (
-	"github.com/apsdehal/go-logger"
+	"github.com/gjvnq/go-logger"
+	"os"
 )
 
 func main () {
@@ -29,16 +30,24 @@ func main () {
 
 	// Critically log critical
 	log.Critical("This is Critical!")
+	log.CriticalF("%+v", err)
 	// Debug
 	log.Debug("This is Debug!")
+	log.DebugF("Here are some numbers: %d %d %f", 10, -3, 3.14)
 	// Give the Warning
 	log.Warning("This is Warning!")
+	log.WarningF("This is Warning!")
 	// Show the error
 	log.Error("This is Error!")
+	log.ErrorF("This is Error!")
 	// Notice
 	log.Notice("This is Notice!")
+	log.NoticeF("%s %s", "This", "is Notice!")
 	// Show the info
 	log.Info("This is Info!")
+	log.InfoF("This is %s!", "Info")
+
+	log.StackAsError("Message before printing stack");
 }
 ```
 

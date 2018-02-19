@@ -12,14 +12,24 @@ import (
 	"runtime"
 	"sync/atomic"
 	"time"
+	"strings"
 )
 
 var (
 	// Map for te various codes of colors
 	colors map[string]string
 
+	// Map from format's placeholders to printf verbs
+	phfs map[string]string
+
 	// Contains color strings for stdout
 	logNo uint64
+
+	// Default format of log message
+	defFmt = "#%[1]d %[2]s %[4]s:%[5]d ▶ %.3[6]s %[7]s"
+
+	// Default format of time
+	defTimeFmt = "2006-01-02 15:04:05"
 )
 
 // Color numbers for stdout
@@ -37,8 +47,10 @@ const (
 // Worker class, Worker is a log object used to log messages and Color specifies
 // if colored output is to be produced
 type Worker struct {
-	Minion *log.Logger
-	Color  int
+	Minion 			*log.Logger
+	Color  			int
+	format 			string
+	timeFormat 	string
 }
 
 // Info class, Contains all the info on what has to logged, time is the current time, Module is the specific module
@@ -52,7 +64,7 @@ type Info struct {
 	Line     int
 	Filename string
 	Message  string
-	format   string
+	//format   string
 }
 
 // Logger class that is an interface to user to log messages, Module is the module for which we are testing
@@ -62,16 +74,89 @@ type Logger struct {
 	worker *Worker
 }
 
+// init pkg
+func init() {
+	initColors()
+	initFormatPlaceholders()
+}
+
 // Returns a proper string to be outputted for a particular info
-func (r *Info) Output() string {
-	msg := fmt.Sprintf(r.format, r.Id, r.Time, r.Filename, r.Line, r.Level, r.Message)
+func (r *Info) Output(format string) string {
+	msg := fmt.Sprintf(format,
+		r.Id, 				// %[1] // %{id}
+		r.Time, 			// %[2] // %{time[:fmt]}
+		r.Module, 		// %[3] // %{module}
+		r.Filename, 	// %[4] // %{filename}
+		r.Line, 			// %[5] // %{line}
+		r.Level, 			// %[6] // %{level}
+		r.Message,		// %[7] // %{message}
+	)
+	// Ignore printf errors if len(args) > len(verbs)
+	if i := strings.LastIndex(msg, "%!(EXTRA"); i != -1 {
+		return msg[:i]
+	}
 	return msg
+}
+
+// Analyze and represent format string as printf format string and time format
+func parseFormat(format string) (msgfmt, timefmt string) {
+	if len(format) < 10 /* (len of "%{message} */ {
+		return defFmt, defTimeFmt
+	}
+	timefmt = defTimeFmt
+	idx := strings.IndexRune(format, '%')
+	for idx != -1 {
+		msgfmt += format[:idx]
+		format = format[idx:]
+		if len(format) > 2 {
+			if format[1] == '{' {
+				if jdx := strings.IndexRune(format, '}'); jdx != -1 {
+					verb, arg := ph2verb(format[:jdx+1])
+					msgfmt += verb
+					if verb == `%[2]s` /* %{time} */ {
+						timefmt = arg
+					}
+					format = format[jdx+1:]
+				}
+			}
+		}
+		idx = strings.IndexRune(format, '%')
+	}
+	msgfmt += format
+	return
+}
+
+// translate format placeholder to printf verb and some argument of placeholder
+// (now used only as time format)
+func ph2verb(ph string) (verb string, arg string) {
+	n := len(ph)
+	if n < 4 { return ``, `` }
+	if ph[0] != '%' || ph[1] != '{' || ph[n-1] != '}' { return ``, `` }
+	idx := strings.IndexRune(ph, ':')
+	if idx == -1 {
+		return phfs[ph], ``
+	}
+	verb = phfs[ ph[:idx] + "}" ]
+	arg = ph[idx+1:n-1]
+	return
 }
 
 // Returns an instance of worker class, prefix is the string attached to every log,
 // flag determine the log params, color parameters verifies whether we need colored outputs or not
 func NewWorker(prefix string, flag int, color int, out io.Writer) *Worker {
-	return &Worker{Minion: log.New(out, prefix, flag), Color: color}
+	return &Worker{Minion: log.New(out, prefix, flag), Color: color, format: defFmt, timeFormat: defTimeFmt}
+}
+
+func SetDefaultFormat(format string) {
+	defFmt, defTimeFmt = parseFormat(format)
+}
+
+func (w *Worker) SetFormat(format string) {
+	w.format, w.timeFormat = parseFormat(format)
+}
+
+func (l *Logger) SetFormat(format string) {
+	l.worker.SetFormat(format)
 }
 
 // Function of Worker class to log a string based on level
@@ -79,11 +164,11 @@ func (w *Worker) Log(level string, calldepth int, info *Info) error {
 	if w.Color != 0 {
 		buf := &bytes.Buffer{}
 		buf.Write([]byte(colors[level]))
-		buf.Write([]byte(info.Output()))
+		buf.Write([]byte(info.Output(w.format)))
 		buf.Write([]byte("\033[0m"))
 		return w.Minion.Output(calldepth+1, buf.String())
 	} else {
-		return w.Minion.Output(calldepth+1, info.Output())
+		return w.Minion.Output(calldepth+1, info.Output(w.format))
 	}
 }
 
@@ -104,11 +189,26 @@ func initColors() {
 	}
 }
 
+// Initializes the map of placeholders
+func initFormatPlaceholders() {
+	phfs = map[string]string {
+		"%{id}" 			: "%[1]d",
+		"%{time}" 		:	"%[2]s",
+		"%{module}" 	: "%[3]s",
+		"%{filename}" : "%[4]s",
+		"%{file}"			: "%[4]s",
+		"%{line}" 		: "%[5]d",
+		"%{level}"		: "%[6]s",
+		"%{lvl}"			: "%[6].3s",
+		"%{message}"	: "%[7]s",
+	}
+}
+
 // Returns a new instance of logger class, module is the specific module for which we are logging
 // , color defines whether the output is to be colored or not, out is instance of type io.Writer defaults
 // to os.Stderr
 func New(args ...interface{}) (*Logger, error) {
-	initColors()
+	//initColors()
 
 	var module string = "DEFAULT"
 	var color int = 1
@@ -137,18 +237,18 @@ func (l *Logger) Log(lvl string, message string) {
 }
 
 func (l *Logger) log_internal(lvl string, message string, pos int) {
-	var formatString string = "#%d %s %s:%d ▶ %.3s %s"
+	//var formatString string = "#%d %s [%s] %s:%d ▶ %.3s %s"
 	_, filename, line, _ := runtime.Caller(pos)
 	filename = path.Base(filename)
 	info := &Info{
 		Id:       atomic.AddUint64(&logNo, 1),
-		Time:     time.Now().Format("2006-01-02 15:04:05"),
+		Time:     time.Now().Format(l.worker.timeFormat),
 		Module:   l.Module,
 		Level:    lvl,
 		Message:  message,
 		Filename: filename,
 		Line:     line,
-		format:   formatString,
+		//format:   formatString,
 	}
 	l.worker.Log(lvl, 2, info)
 }

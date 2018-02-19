@@ -47,10 +47,10 @@ const (
 // Worker class, Worker is a log object used to log messages and Color specifies
 // if colored output is to be produced
 type Worker struct {
-	Minion 			*log.Logger
-	Color  			int
-	format 			string
-	timeFormat 	string
+	Minion      *log.Logger
+	Color       int
+	format      string
+	timeFormat  string
 }
 
 // Info class, Contains all the info on what has to logged, time is the current time, Module is the specific module
@@ -83,13 +83,13 @@ func init() {
 // Returns a proper string to be outputted for a particular info
 func (r *Info) Output(format string) string {
 	msg := fmt.Sprintf(format,
-		r.Id, 				// %[1] // %{id}
-		r.Time, 			// %[2] // %{time[:fmt]}
-		r.Module, 		// %[3] // %{module}
-		r.Filename, 	// %[4] // %{filename}
-		r.Line, 			// %[5] // %{line}
-		r.Level, 			// %[6] // %{level}
-		r.Message,		// %[7] // %{message}
+		r.Id,         // %[1] // %{id}
+		r.Time,       // %[2] // %{time[:fmt]}
+		r.Module,     // %[3] // %{module}
+		r.Filename,   // %[4] // %{filename}
+		r.Line,       // %[5] // %{line}
+		r.Level,      // %[6] // %{level}
+		r.Message,    // %[7] // %{message}
 	)
 	// Ignore printf errors if len(args) > len(verbs)
 	if i := strings.LastIndex(msg, "%!(EXTRA"); i != -1 {
@@ -197,15 +197,15 @@ func initColors() {
 // Initializes the map of placeholders
 func initFormatPlaceholders() {
 	phfs = map[string]string {
-		"%{id}" 			: "%[1]d",
-		"%{time}" 		:	"%[2]s",
-		"%{module}" 	: "%[3]s",
+		"%{id}"       : "%[1]d",
+		"%{time}"     : "%[2]s",
+		"%{module}"   : "%[3]s",
 		"%{filename}" : "%[4]s",
-		"%{file}"			: "%[4]s",
-		"%{line}" 		: "%[5]d",
-		"%{level}"		: "%[6]s",
-		"%{lvl}"			: "%[6].3s",
-		"%{message}"	: "%[7]s",
+		"%{file}"     : "%[4]s",
+		"%{line}"     : "%[5]d",
+		"%{level}"    : "%[6]s",
+		"%{lvl}"      : "%[6].3s",
+		"%{message}"  : "%[7]s",
 	}
 }
 
@@ -270,6 +270,12 @@ func (l *Logger) FatalF(format string, a ...interface{}) {
 	os.Exit(1)
 }
 
+// FatalF is just like func l.CriticalF logger except that it is followed by exit to program
+func (l *Logger) Fatalf(format string, a ...interface{}) {
+	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
+	os.Exit(1)
+}
+
 // Panic is just like func l.Critical except that it is followed by a call to panic
 func (l *Logger) Panic(message string) {
 	l.log_internal("CRITICAL", message, 2)
@@ -278,6 +284,12 @@ func (l *Logger) Panic(message string) {
 
 // PanicF is just like func l.CriticalF except that it is followed by a call to panic
 func (l *Logger) PanicF(format string, a ...interface{}) {
+	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
+	panic(fmt.Sprintf(format, a...))
+}
+
+// PanicF is just like func l.CriticalF except that it is followed by a call to panic
+func (l *Logger) Panicf(format string, a ...interface{}) {
 	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
 	panic(fmt.Sprintf(format, a...))
 }
@@ -292,6 +304,11 @@ func (l *Logger) CriticalF(format string, a ...interface{}) {
 	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
 }
 
+// CriticalF logs a message at Critical level using the same syntax and options as fmt.Printf
+func (l *Logger) Criticalf(format string, a ...interface{}) {
+	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
+}
+
 // Error logs a message at Error level
 func (l *Logger) Error(message string) {
 	l.log_internal("ERROR", message, 2)
@@ -299,6 +316,11 @@ func (l *Logger) Error(message string) {
 
 // ErrorF logs a message at Error level using the same syntax and options as fmt.Printf
 func (l *Logger) ErrorF(format string, a ...interface{}) {
+	l.log_internal("ERROR", fmt.Sprintf(format, a...), 2)
+}
+
+// ErrorF logs a message at Error level using the same syntax and options as fmt.Printf
+func (l *Logger) Errorf(format string, a ...interface{}) {
 	l.log_internal("ERROR", fmt.Sprintf(format, a...), 2)
 }
 
@@ -312,6 +334,11 @@ func (l *Logger) WarningF(format string, a ...interface{}) {
 	l.log_internal("WARNING", fmt.Sprintf(format, a...), 2)
 }
 
+// WarningF logs a message at Warning level using the same syntax and options as fmt.Printf
+func (l *Logger) Warningf(format string, a ...interface{}) {
+	l.log_internal("WARNING", fmt.Sprintf(format, a...), 2)
+}
+
 // Notice logs a message at Notice level
 func (l *Logger) Notice(message string) {
 	l.log_internal("NOTICE", message, 2)
@@ -319,6 +346,11 @@ func (l *Logger) Notice(message string) {
 
 // NoticeF logs a message at Notice level using the same syntax and options as fmt.Printf
 func (l *Logger) NoticeF(format string, a ...interface{}) {
+	l.log_internal("NOTICE", fmt.Sprintf(format, a...), 2)
+}
+
+// NoticeF logs a message at Notice level using the same syntax and options as fmt.Printf
+func (l *Logger) Noticef(format string, a ...interface{}) {
 	l.log_internal("NOTICE", fmt.Sprintf(format, a...), 2)
 }
 
@@ -332,6 +364,11 @@ func (l *Logger) InfoF(format string, a ...interface{}) {
 	l.log_internal("INFO", fmt.Sprintf(format, a...), 2)
 }
 
+// InfoF logs a message at Info level using the same syntax and options as fmt.Printf
+func (l *Logger) Infof(format string, a ...interface{}) {
+	l.log_internal("INFO", fmt.Sprintf(format, a...), 2)
+}
+
 // Debug logs a message at Debug level
 func (l *Logger) Debug(message string) {
 	l.log_internal("DEBUG", message, 2)
@@ -339,6 +376,11 @@ func (l *Logger) Debug(message string) {
 
 // DebugF logs a message at Debug level using the same syntax and options as fmt.Printf
 func (l *Logger) DebugF(format string, a ...interface{}) {
+	l.log_internal("DEBUG", fmt.Sprintf(format, a...), 2)
+}
+
+// DebugF logs a message at Debug level using the same syntax and options as fmt.Printf
+func (l *Logger) Debugf(format string, a ...interface{}) {
 	l.log_internal("DEBUG", fmt.Sprintf(format, a...), 2)
 }
 

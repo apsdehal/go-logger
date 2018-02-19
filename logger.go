@@ -117,7 +117,12 @@ func parseFormat(format string) (msgfmt, timefmt string) {
 						timefmt = arg
 					}
 					format = format[jdx+1:]
+				} else {
+					format = format[1:]
 				}
+			} else {
+				msgfmt += "%"
+				format = format[1:]
 			}
 		}
 		idx = strings.IndexRune(format, '%')

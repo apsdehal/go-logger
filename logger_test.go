@@ -77,7 +77,7 @@ func TestColorString(t *testing.T) {
 }
 
 func TestInitColors(t *testing.T) {
-	initColors()
+	//initColors()
 	var tests = []struct {
 		level       string
 		color       int

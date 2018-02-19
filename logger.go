@@ -47,10 +47,10 @@ const (
 // Worker class, Worker is a log object used to log messages and Color specifies
 // if colored output is to be produced
 type Worker struct {
-	Minion 			*log.Logger
-	Color  			int
-	format 			string
-	timeFormat 	string
+	Minion      *log.Logger
+	Color       int
+	format      string
+	timeFormat  string
 }
 
 // Info class, Contains all the info on what has to logged, time is the current time, Module is the specific module
@@ -83,13 +83,13 @@ func init() {
 // Returns a proper string to be outputted for a particular info
 func (r *Info) Output(format string) string {
 	msg := fmt.Sprintf(format,
-		r.Id, 				// %[1] // %{id}
-		r.Time, 			// %[2] // %{time[:fmt]}
-		r.Module, 		// %[3] // %{module}
-		r.Filename, 	// %[4] // %{filename}
-		r.Line, 			// %[5] // %{line}
-		r.Level, 			// %[6] // %{level}
-		r.Message,		// %[7] // %{message}
+		r.Id,         // %[1] // %{id}
+		r.Time,       // %[2] // %{time[:fmt]}
+		r.Module,     // %[3] // %{module}
+		r.Filename,   // %[4] // %{filename}
+		r.Line,       // %[5] // %{line}
+		r.Level,      // %[6] // %{level}
+		r.Message,    // %[7] // %{message}
 	)
 	// Ignore printf errors if len(args) > len(verbs)
 	if i := strings.LastIndex(msg, "%!(EXTRA"); i != -1 {
@@ -197,15 +197,15 @@ func initColors() {
 // Initializes the map of placeholders
 func initFormatPlaceholders() {
 	phfs = map[string]string {
-		"%{id}" 			: "%[1]d",
-		"%{time}" 		:	"%[2]s",
-		"%{module}" 	: "%[3]s",
+		"%{id}"       : "%[1]d",
+		"%{time}"     : "%[2]s",
+		"%{module}"   : "%[3]s",
 		"%{filename}" : "%[4]s",
-		"%{file}"			: "%[4]s",
-		"%{line}" 		: "%[5]d",
-		"%{level}"		: "%[6]s",
-		"%{lvl}"			: "%[6].3s",
-		"%{message}"	: "%[7]s",
+		"%{file}"     : "%[4]s",
+		"%{line}"     : "%[5]d",
+		"%{level}"    : "%[6]s",
+		"%{lvl}"      : "%[6].3s",
+		"%{message}"  : "%[7]s",
 	}
 }
 

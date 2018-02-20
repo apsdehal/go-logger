@@ -25,4 +25,12 @@ func main () {
 	log.Notice("This is Notice!")
 	// Show the info
 	log.Info("This is Info!")
+
+	// Show warning with format message
+	log.SetFormat("[%{module}] [%{level}] %{message}")
+	log.Warning("This is Warning!")
+	// Also you can set your format as default format for all new loggers
+	logger.SetDefaultFormat("%{message}")
+	log2, _ := logger.New("pkg", 1, os.Stdout)
+	log2.Error("This is Error!")
 }

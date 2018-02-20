@@ -110,9 +110,22 @@ func parseFormat(format string) (msgfmt, timefmt string) {
 		format = format[idx:]
 		if len(format) > 2 {
 			if format[1] == '{' {
+				// end of curr verb pos
 				if jdx := strings.IndexRune(format, '}'); jdx != -1 {
+					// next verb pos
+					idx = strings.Index(format[1:], "%{")
+					// incorrect verb found ("...%{wefwef ...") but after
+					// this, new verb (maybe) exists ("...%{inv %{verb}...")
+					if idx != -1 && idx < jdx {
+						msgfmt += "%%"
+						format = format[1:]
+						continue
+					}
+					// get verb and arg
 					verb, arg := ph2verb(format[:jdx+1])
 					msgfmt += verb
+					// check if verb is time
+					// here you can handle args for other verbs
 					if verb == `%[2]s` /* %{time} */ {
 						timefmt = arg
 					}
@@ -121,7 +134,7 @@ func parseFormat(format string) (msgfmt, timefmt string) {
 					format = format[1:]
 				}
 			} else {
-				msgfmt += "%"
+				msgfmt += "%%"
 				format = format[1:]
 			}
 		}
@@ -204,7 +217,7 @@ func initFormatPlaceholders() {
 		"%{file}"     : "%[4]s",
 		"%{line}"     : "%[5]d",
 		"%{level}"    : "%[6]s",
-		"%{lvl}"      : "%[6].3s",
+		"%{lvl}"      : "%.3[6]s",
 		"%{message}"  : "%[7]s",
 	}
 }

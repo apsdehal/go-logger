@@ -3,6 +3,10 @@ package logger
 import (
 	"os"
 	"testing"
+	"bytes"
+	"time"
+	"fmt"
+	"math"
 )
 
 func BenchmarkLoggerLog(b *testing.B) {
@@ -135,5 +139,78 @@ func BenchmarkNewWorker(b *testing.B) {
 		if worker == nil {
 			panic("Failed to initiate worker")
 		}
+	}
+}
+
+func TestLogger_SetFormat(t *testing.T) {
+	var buf bytes.Buffer
+	log, err := New("pkgname", 0, &buf)
+	if err != nil || log == nil {
+		panic(err)
+	}
+	log.Debug("Test")
+	want := time.Now().Format("2006-01-02 15:04:05")
+	want = fmt.Sprintf("#1 %s logger_test.go:151 ▶ DEB Test\n", want)
+	have := buf.String()
+	if have != want {
+		t.Errorf("\nWant: %sHave: %s", want, have)
+	}
+	format :=
+		"text123 %{id} " + // text and digits before id
+		"!@#$% %{time:Monday, 2006 Jan 01, 15:04:05} " + // symbols before time with spec format
+		"a{b %{module} " + // brace with text that should be just text before verb
+		"a}b %{filename} " + // brace with text that should be just text before verb
+		"%% %{file} " + // percent symbols before verb
+		"%{%{line} " + // percent symbol with brace before verb w/o space
+		"%{nonex_verb} %{lvl} " + // nonexistent verb berfore real verb
+		"%{incorr_verb %{level} " + // incorrect verb before real verb
+		"%{} [%{message}]" // empty verb before message in sq brackets
+	buf.Reset()
+	log.SetFormat(format)
+	log.Error("This is Error!")
+	now := time.Now()
+	want = fmt.Sprintf(
+		"text123 2 " +
+		"!@#$%% %s " +
+		"a{b pkgname " +
+		"a}b logger_test.go " +
+		"%%%% logger_test.go " + // it's printf, escaping %, don't forget
+		"%%{170 " +
+		" ERR " +
+		"%%{incorr_verb ERROR " +
+		" [This is Error!]\n",
+		now.Format("Monday, 2006 Jan 01, 15:04:05"),
+	)
+	have = buf.String()
+	if want != have {
+		t.Errorf("\nWant: %sHave: %s", want, have)
+		want_len := len(want)
+		have_len := len(have)
+		min := int(math.Min(float64(want_len), float64(have_len)))
+		if want_len != have_len {
+			t.Errorf("Diff lens: Want: %d, Have: %d.\n", want_len, have_len)
+		}
+		for i := 0; i < min; i++ {
+			if want[i] != have[i] {
+				t.Errorf("Differents starts at %d pos (\"%c\" != \"%c\")\n",
+					i, want[i], have[i])
+				break
+			}
+		}
+	}
+}
+
+func TestSetDefaultFormat(t *testing.T) {
+	SetDefaultFormat("%{module} %{lvl} %{message}")
+	var buf bytes.Buffer
+	log, err := New("pkgname", 0, &buf)
+	if err != nil || log == nil {
+		panic(err)
+	}
+	log.Criticalf("Test %d", 123)
+	want := "pkgname CRI Test 123\n"
+	have := buf.String()
+	if want != have {
+		t.Errorf("\nWant: %sHave: %s", want, have)
 	}
 }

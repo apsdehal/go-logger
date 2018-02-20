@@ -303,7 +303,8 @@ func (l *Logger) PanicF(format string, a ...interface{}) {
 
 // PanicF is just like func l.CriticalF except that it is followed by a call to panic
 func (l *Logger) Panicf(format string, a ...interface{}) {
-	l.PanicF(format, a...)
+	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
+	panic(fmt.Sprintf(format, a...))
 }
 
 // Critical logs a message at a Critical Level
@@ -318,7 +319,7 @@ func (l *Logger) CriticalF(format string, a ...interface{}) {
 
 // CriticalF logs a message at Critical level using the same syntax and options as fmt.Printf
 func (l *Logger) Criticalf(format string, a ...interface{}) {
-	l.CriticalF(format, a...)
+	l.log_internal("CRITICAL", fmt.Sprintf(format, a...), 2)
 }
 
 // Error logs a message at Error level
@@ -333,7 +334,7 @@ func (l *Logger) ErrorF(format string, a ...interface{}) {
 
 // ErrorF logs a message at Error level using the same syntax and options as fmt.Printf
 func (l *Logger) Errorf(format string, a ...interface{}) {
-	l.ErrorF(format, a...)
+	l.log_internal("ERROR", fmt.Sprintf(format, a...), 2)
 }
 
 // Warning logs a message at Warning level
@@ -348,7 +349,7 @@ func (l *Logger) WarningF(format string, a ...interface{}) {
 
 // WarningF logs a message at Warning level using the same syntax and options as fmt.Printf
 func (l *Logger) Warningf(format string, a ...interface{}) {
-	l.WarningF(format, a...)
+	l.log_internal("WARNING", fmt.Sprintf(format, a...), 2)
 }
 
 // Notice logs a message at Notice level
@@ -363,7 +364,7 @@ func (l *Logger) NoticeF(format string, a ...interface{}) {
 
 // NoticeF logs a message at Notice level using the same syntax and options as fmt.Printf
 func (l *Logger) Noticef(format string, a ...interface{}) {
-	l.NoticeF(format, a...)
+	l.log_internal("NOTICE", fmt.Sprintf(format, a...), 2)
 }
 
 // Info logs a message at Info level
@@ -378,7 +379,7 @@ func (l *Logger) InfoF(format string, a ...interface{}) {
 
 // InfoF logs a message at Info level using the same syntax and options as fmt.Printf
 func (l *Logger) Infof(format string, a ...interface{}) {
-	l.InfoF(format, a...)
+	l.log_internal("INFO", fmt.Sprintf(format, a...), 2)
 }
 
 // Debug logs a message at Debug level
@@ -393,7 +394,7 @@ func (l *Logger) DebugF(format string, a ...interface{}) {
 
 // DebugF logs a message at Debug level using the same syntax and options as fmt.Printf
 func (l *Logger) Debugf(format string, a ...interface{}) {
-	l.DebugF(format, a...)
+	l.log_internal("DEBUG", fmt.Sprintf(format, a...), 2)
 }
 
 // Prints this goroutine's execution stack as an error with an optional message at the begining

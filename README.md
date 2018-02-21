@@ -112,8 +112,9 @@ Invalid verbs (like ```%{inv-verb```) will be treated as plain text.
 
 # Tests
 
-Run `go test logger` to run test on logger
-and `go bench` for benchmarks
+Run: 
+- `go test logger` to run test on logger.
+- `go test -bench=.` for benchmarks.
 
 ## Thanks
 

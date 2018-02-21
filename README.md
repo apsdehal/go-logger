@@ -4,60 +4,29 @@
 [![Build Status](https://travis-ci.org/apsdehal/go-logger.svg?branch=master)](https://travis-ci.org/apsdehal/go-logger)
 [![GoDoc](https://godoc.org/github.com/apsdehal/go-logger?status.svg)](http://godoc.org/github.com/apsdehal/go-logger)
 
-A simple go logger for easy logging and debugging of your programs
+A simple go logger for easy logging in your programs. Allows setting custom format for messages.
 
 # Preview
+
 [![Example Output](examples/example.png)](examples/example.go)
 
-# Formatting
-By default all log messages have format that you can see above (on pic).
-But you can override the default format and set format that you want.
 
-You can do it for Logger instance (after creating logger) ...
-```go
-log, _ := logger.New("pkgname", 1)
-log.SetFormat(format)
-```
-... or for package
-```go
-logger.SetDefaultFormat(format)
-```
-If you do it for package, all existing loggers will print log messages with format that these used already.
-But all newest loggers (which will be created after changing format for package) will use your specified format.
+# Install
 
-But anyway after this, you can still set format of message for specific Logger instance.
+`go get github.com/apsdehal/go-logger`
 
-Format of log message must contains verbs that represent some info about current log entry.
-Ofc, format can contain not only verbs but also something else (for example text, digits, symbols, etc)
-
-### Format verbs:
-You can use the following verbs:
-```
-%{id}           - means number of current log message
-%{module}       - means module name (that you passed to func New())
-%{time}			- means current time in format "2006-01-02 15:04:05"
-%{time:format}	- means current time in format that you want
-					(supports all formats supported by go package "time")
-%{level}		- means level name (upper case) of log message ("ERROR", "DEBUG", etc)
-%{lvl}			- means first 3 letters of level name (upper case) of log message ("ERR", "DEB", etc)
-%{file} 		- means name of file in what you wanna write log
-%{filename}		- means the same as %{file}
-%{line}			- means line number of file in what you wanna write log
-%{message}		- means your log message
-```
-Non-existent verbs (like ```%{nonex-verb}``` or ```%{}```) will be replaced by an empty string.
-Invalid verbs (like ```%{inv-verb```) will be treated as plain text.
+Use `go get -u` to update the package.
 
 # Example
 
-Example [program](examples/example.go) demonstrates how to use the logger.
+Example [program](examples/example.go) demonstrates how to use the logger. See below for __formatting__ instructions.
 
 
 ```go
 package main
 
 import (
-	"github.com/gjvnq/go-logger"
+	"github.com/apsdehal/go-logger"
 	"os"
 )
 
@@ -101,11 +70,45 @@ func main () {
 }
 ```
 
-# Install
 
-`go get github.com/apsdehal/go-logger`
+# Formatting
+By default all log messages have format that you can see above (on pic).
+But you can override the default format and set format that you want.
 
-Use `go get -u` to update the package.
+You can do it for Logger instance (after creating logger) ...
+```go
+log, _ := logger.New("pkgname", 1)
+log.SetFormat(format)
+```
+... or for package
+```go
+logger.SetDefaultFormat(format)
+```
+If you do it for package, all existing loggers will print log messages with format that these used already.
+But all newest loggers (which will be created after changing format for package) will use your specified format.
+
+But anyway after this, you can still set format of message for specific Logger instance.
+
+Format of log message must contains verbs that represent some info about current log entry.
+Ofc, format can contain not only verbs but also something else (for example text, digits, symbols, etc)
+
+### Format verbs:
+You can use the following verbs:
+```
+%{id}           - means number of current log message
+%{module}       - means module name (that you passed to func New())
+%{time}			- means current time in format "2006-01-02 15:04:05"
+%{time:format}	- means current time in format that you want
+					(supports all formats supported by go package "time")
+%{level}		- means level name (upper case) of log message ("ERROR", "DEBUG", etc)
+%{lvl}			- means first 3 letters of level name (upper case) of log message ("ERR", "DEB", etc)
+%{file} 		- means name of file in what you wanna write log
+%{filename}		- means the same as %{file}
+%{line}			- means line number of file in what you wanna write log
+%{message}		- means your log message
+```
+Non-existent verbs (like ```%{nonex-verb}``` or ```%{}```) will be replaced by an empty string.
+Invalid verbs (like ```%{inv-verb```) will be treated as plain text.
 
 # Tests
 
@@ -114,10 +117,16 @@ and `go bench` for benchmarks
 
 ## Thanks
 
-Thanks goes to all go-loggers out there in github world
+Thanks goes to all go-loggers out there which I used as reference.
+
+## Contributors
+
+Following contributors have made major contributions to go-logger:
+
+- [@qioalice](https://github.com/qioalice)
+- [@gjvnq](https://github.com/gjvnq)
 
 ## License
 
-The [BSD 3-Clause license][bsd], the same as the [Go language][golang].
-[bsd]: http://opensource.org/licenses/BSD-3-Clause
-[golang]: http://golang.org/LICENSE
+The [BSD 3-Clause license](http://opensource.org/licenses/BSD-3-Clause), the same as the [Go language](http://golang.org/LICENSE).
+

@@ -179,8 +179,8 @@ func ph2verb(ph string) (verb string, arg string) {
 
 // Returns an instance of worker class, prefix is the string attached to every log,
 // flag determine the log params, color parameters verifies whether we need colored outputs or not
-func NewWorker(prefix string, flag int, color int, out io.Writer, level LogLevel) *Worker {
-	return &Worker{Minion: log.New(out, prefix, flag), Color: color, format: defFmt, timeFormat: defTimeFmt, level: level}
+func NewWorker(prefix string, flag int, color int, out io.Writer) *Worker {
+	return &Worker{Minion: log.New(out, prefix, flag), Color: color, format: defFmt, timeFormat: defTimeFmt}
 }
 
 func SetDefaultFormat(format string) {
@@ -193,6 +193,10 @@ func (w *Worker) SetFormat(format string) {
 
 func (l *Logger) SetFormat(format string) {
 	l.worker.SetFormat(format)
+}
+
+func (w *Worker) SetLogLevel(level LogLevel) {
+	w.level = level
 }
 
 func (l *Logger) SetLogLevel(level LogLevel) {
@@ -274,7 +278,8 @@ func New(args ...interface{}) (*Logger, error) {
 			panic("logger: Unknown argument")
 		}
 	}
-	newWorker := NewWorker("", 0, color, out, level)
+	newWorker := NewWorker("", 0, color, out)
+	newWorker.SetLogLevel(level)
 	return &Logger{Module: module, worker: newWorker}, nil
 }
 

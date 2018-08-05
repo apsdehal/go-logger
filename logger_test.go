@@ -128,7 +128,7 @@ func TestInitColors(t *testing.T) {
 }
 
 func TestNewWorker(t *testing.T) {
-	var worker *Worker = NewWorker("", 0, 1, os.Stderr, InfoLevel)
+	var worker *Worker = NewWorker("", 0, 1, os.Stderr)
 	if worker.Minion == nil {
 		t.Errorf("Minion was not established")
 	}
@@ -136,7 +136,7 @@ func TestNewWorker(t *testing.T) {
 
 func BenchmarkNewWorker(b *testing.B) {
 	for n := 0; n <= b.N; n++ {
-		worker := NewWorker("", 0, 1, os.Stderr, InfoLevel)
+		worker := NewWorker("", 0, 1, os.Stderr)
 		if worker == nil {
 			panic("Failed to initiate worker")
 		}

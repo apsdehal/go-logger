@@ -1,12 +1,13 @@
 package logger
 
 import (
-	"os"
-	"testing"
 	"bytes"
-	"time"
 	"fmt"
 	"math"
+	"os"
+	"strings"
+	"testing"
+	"time"
 )
 
 func BenchmarkLoggerLog(b *testing.B) {
@@ -17,31 +18,31 @@ func BenchmarkLoggerLog(b *testing.B) {
 	}
 
 	var tests = []struct {
-		level   string
+		level   LogLevel
 		message string
 	}{
 		{
-			"CRITICAL",
+			CriticalLevel,
 			"Critical Logging",
 		},
 		{
-			"INFO",
+			InfoLevel,
 			"Info Logging",
 		},
 		{
-			"DEBUG",
+			DebugLevel,
 			"Debug logging",
 		},
 		{
-			"WARNING",
+			WarningLevel,
 			"Warning logging",
 		},
 		{
-			"NOTICE",
+			NoticeLevel,
 			"Notice Logging",
 		},
 		{
-			"ERROR",
+			ErrorLevel,
 			"Error logging",
 		},
 	}
@@ -83,37 +84,37 @@ func TestColorString(t *testing.T) {
 func TestInitColors(t *testing.T) {
 	//initColors()
 	var tests = []struct {
-		level       string
+		level       LogLevel
 		color       int
 		colorString string
 	}{
 		{
-			"CRITICAL",
+			CriticalLevel,
 			Magenta,
 			"\033[35m",
 		},
 		{
-			"ERROR",
+			ErrorLevel,
 			Red,
 			"\033[31m",
 		},
 		{
-			"WARNING",
+			WarningLevel,
 			Yellow,
 			"\033[33m",
 		},
 		{
-			"NOTICE",
+			NoticeLevel,
 			Green,
 			"\033[32m",
 		},
 		{
-			"DEBUG",
+			DebugLevel,
 			Cyan,
 			"\033[36m",
 		},
 		{
-			"INFO",
+			InfoLevel,
 			White,
 			"\033[37m",
 		},
@@ -150,35 +151,35 @@ func TestLogger_SetFormat(t *testing.T) {
 	}
 	log.Debug("Test")
 	want := time.Now().Format("2006-01-02 15:04:05")
-	want = fmt.Sprintf("#1 %s logger_test.go:151 ▶ DEB Test\n", want)
+	want = fmt.Sprintf("#1 %s logger_test.go:152 ▶ DEB Test\n", want)
 	have := buf.String()
 	if have != want {
 		t.Errorf("\nWant: %sHave: %s", want, have)
 	}
 	format :=
 		"text123 %{id} " + // text and digits before id
-		"!@#$% %{time:Monday, 2006 Jan 01, 15:04:05} " + // symbols before time with spec format
-		"a{b %{module} " + // brace with text that should be just text before verb
-		"a}b %{filename} " + // brace with text that should be just text before verb
-		"%% %{file} " + // percent symbols before verb
-		"%{%{line} " + // percent symbol with brace before verb w/o space
-		"%{nonex_verb} %{lvl} " + // nonexistent verb berfore real verb
-		"%{incorr_verb %{level} " + // incorrect verb before real verb
-		"%{} [%{message}]" // empty verb before message in sq brackets
+			"!@#$% %{time:Monday, 2006 Jan 01, 15:04:05} " + // symbols before time with spec format
+			"a{b %{module} " + // brace with text that should be just text before verb
+			"a}b %{filename} " + // brace with text that should be just text before verb
+			"%% %{file} " + // percent symbols before verb
+			"%{%{line} " + // percent symbol with brace before verb w/o space
+			"%{nonex_verb} %{lvl} " + // nonexistent verb berfore real verb
+			"%{incorr_verb %{level} " + // incorrect verb before real verb
+			"%{} [%{message}]" // empty verb before message in sq brackets
 	buf.Reset()
 	log.SetFormat(format)
 	log.Error("This is Error!")
 	now := time.Now()
 	want = fmt.Sprintf(
-		"text123 2 " +
-		"!@#$%% %s " +
-		"a{b pkgname " +
-		"a}b logger_test.go " +
-		"%%%% logger_test.go " + // it's printf, escaping %, don't forget
-		"%%{170 " +
-		" ERR " +
-		"%%{incorr_verb ERROR " +
-		" [This is Error!]\n",
+		"text123 2 "+
+			"!@#$%% %s "+
+			"a{b pkgname "+
+			"a}b logger_test.go "+
+			"%%%% logger_test.go "+ // it's printf, escaping %, don't forget
+			"%%{171 "+
+			" ERR "+
+			"%%{incorr_verb ERROR "+
+			" [This is Error!]\n",
 		now.Format("Monday, 2006 Jan 01, 15:04:05"),
 	)
 	have = buf.String()
@@ -212,5 +213,63 @@ func TestSetDefaultFormat(t *testing.T) {
 	have := buf.String()
 	if want != have {
 		t.Errorf("\nWant: %sHave: %s", want, have)
+	}
+}
+
+func TestLogLevel(t *testing.T) {
+
+	var tests = []struct {
+		level   LogLevel
+		message string
+	}{
+		{
+			CriticalLevel,
+			"Critical Logging",
+		},
+		{
+			ErrorLevel,
+			"Error logging",
+		},
+
+		{
+			WarningLevel,
+			"Warning logging",
+		},
+		{
+			NoticeLevel,
+			"Notice Logging",
+		},
+		{
+			DebugLevel,
+			"Debug logging",
+		},
+		{
+			InfoLevel,
+			"Info Logging",
+		},
+	}
+
+	var buf bytes.Buffer
+	log, err := New("pkgname", 0, &buf)
+	if err != nil {
+		panic(err)
+	}
+
+	for i, test := range tests {
+		log.SetLogLevel(test.level)
+
+		log.Critical("Log Critical")
+		log.Error("Log Error")
+		log.Warning("Log Warning")
+		log.Notice("Log Notice")
+		log.Debug("Log Debug")
+		log.Info("Log Info")
+
+		// Count output lines from logger
+		count := strings.Count(buf.String(), "\n")
+		if i+1 != count {
+			t.Error()
+		}
+		buf.Reset()
 	}
 }

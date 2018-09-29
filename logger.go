@@ -140,7 +140,7 @@ func parseFormat(format string) (msgfmt, timefmt string) {
 					msgfmt += verb
 					// check if verb is time
 					// here you can handle args for other verbs
-					if verb == `%[2]s` /* %{time} */ {
+					if verb == `%[2]s` && arg != "" /* %{time} */ {
 						timefmt = arg
 					}
 					format = format[jdx+1:]

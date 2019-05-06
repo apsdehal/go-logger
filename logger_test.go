@@ -109,14 +109,14 @@ func TestInitColors(t *testing.T) {
 			"\033[32m",
 		},
 		{
-			DebugLevel,
-			Cyan,
-			"\033[36m",
-		},
-		{
 			InfoLevel,
 			White,
 			"\033[37m",
+		},
+		{
+			DebugLevel,
+			Cyan,
+			"\033[36m",
 		},
 	}
 
@@ -240,12 +240,12 @@ func TestLogLevel(t *testing.T) {
 			"Notice Logging",
 		},
 		{
-			DebugLevel,
-			"Debug logging",
-		},
-		{
 			InfoLevel,
 			"Info Logging",
+		},
+		{
+			DebugLevel,
+			"Debug logging",
 		},
 	}
 
@@ -262,8 +262,8 @@ func TestLogLevel(t *testing.T) {
 		log.Error("Log Error")
 		log.Warning("Log Warning")
 		log.Notice("Log Notice")
-		log.Debug("Log Debug")
 		log.Info("Log Info")
+		log.Debug("Log Debug")
 
 		// Count output lines from logger
 		count := strings.Count(buf.String(), "\n")

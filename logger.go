@@ -53,8 +53,8 @@ const (
 	ErrorLevel
 	WarningLevel
 	NoticeLevel
-	DebugLevel
 	InfoLevel
+	DebugLevel
 )
 
 // Worker class, Worker is a log object used to log messages and Color specifies

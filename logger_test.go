@@ -26,12 +26,8 @@ func BenchmarkLoggerLog(b *testing.B) {
 			"Critical Logging",
 		},
 		{
-			InfoLevel,
-			"Info Logging",
-		},
-		{
-			DebugLevel,
-			"Debug logging",
+			ErrorLevel,
+			"Error logging",
 		},
 		{
 			WarningLevel,
@@ -42,8 +38,12 @@ func BenchmarkLoggerLog(b *testing.B) {
 			"Notice Logging",
 		},
 		{
-			ErrorLevel,
-			"Error logging",
+			InfoLevel,
+			"Info Logging",
+		},
+		{
+			DebugLevel,
+			"Debug logging",
 		},
 	}
 

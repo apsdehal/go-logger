@@ -136,6 +136,7 @@ Following contributors have made major contributions to go-logger:
 
 - [@qioalice](https://github.com/qioalice)
 - [@gjvnq](https://github.com/gjvnq)
+- [@maezen](https://github.com/maezen)
 
 ## License
 

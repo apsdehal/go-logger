@@ -464,8 +464,8 @@ func (info *Info) logLevelString() string {
 		"ERROR",
 		"WARNING",
 		"NOTICE",
-		"DEBUG",
 		"INFO",
+		"DEBUG",
 	}
 	return logLevels[info.Level-1]
 }

@@ -149,9 +149,13 @@ func TestLogger_SetFormat(t *testing.T) {
 	if err != nil || log == nil {
 		panic(err)
 	}
+
+	log.SetLogLevel(DebugLevel)
 	log.Debug("Test")
+	log.SetLogLevel(InfoLevel)
+
 	want := time.Now().Format("2006-01-02 15:04:05")
-	want = fmt.Sprintf("#1 %s logger_test.go:152 ▶ DEB Test\n", want)
+	want = fmt.Sprintf("#1 %s logger_test.go:154 ▶ DEB Test\n", want)
 	have := buf.String()
 	if have != want {
 		t.Errorf("\nWant: %sHave: %s", want, have)
@@ -176,7 +180,7 @@ func TestLogger_SetFormat(t *testing.T) {
 			"a{b pkgname "+
 			"a}b logger_test.go "+
 			"%%%% logger_test.go "+ // it's printf, escaping %, don't forget
-			"%%{171 "+
+			"%%{175 "+
 			" ERR "+
 			"%%{incorr_verb ERROR "+
 			" [This is Error!]\n",

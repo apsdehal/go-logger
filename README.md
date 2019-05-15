@@ -42,6 +42,9 @@ func main () {
 	// Critically log critical
 	log.Critical("This is Critical!")
 	log.CriticalF("%+v", err)
+	// You can also use fmt compliant naming scheme such as log.Criticalf, log.Panicf etc
+	// with small 'f'
+	
 	// Debug
 	// Since default logging level is Info this won't print anything
 	log.Debug("This is Debug!")
